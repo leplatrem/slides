@@ -1,7 +1,15 @@
+.. |br| raw:: html
+
+   <br />
+
 Daybed
 ======
 
-... or spatial backend as a service !
+→ *spatial* storage as a service !
+
+.. image :: media/front-rest-daybed.png
+
+----
 
 * Mathieu Leplatre *(@leplatrem)*
 * PostGIS and Leaflet enthusiast *(training, plugins, Django apps)*
@@ -34,10 +42,20 @@ How would you build... ?
 Why Daybed ?
 ============
 
-* Build collaborative apps *(basic, spatial, encrypted, ...)*
-* Build a Google Forms alternative *(form → model, submission → record)*
-* Do not reinvent the wheel *(JavaScript app without API dev)*
-* Prototype Web applications *(Frontend-dev only)*
+* Build collaborative apps |br| *(basic, spatial, encrypted, ...)*
+* Build a Google Forms alternative |br| *(form → model, submission → record)*
+* Do not reinvent the wheel |br| *(JavaScript app without API dev)*
+* Prototype Web applications |br| *(Frontend-dev only)*
+
+----
+
+Daybed is not...
+================
+
+* Another DBMS *(too naive)*
+* A framework *(client agnostic)*
+* The golden hammer *(not everything is a nail)*
+* A company with a business plan
 
 ----
 
@@ -45,24 +63,32 @@ Daybed is...
 ============
 
 * A Web API *(REST, Create Read Update Delete)*
-* A “*reusable*” backend *(1 instance → N different applications)*
-* A tool for rapid application building *(...or prototyping)*
-
-----
-
-Daybed is not...
-================
-
-* Another SGBD *(too naive)*
-* A framework *(client agnostic)*
-* The golden hammer *(not everything is a nail)*
+* A “reusable” backend |br| *(1 instance → N different applications)*
+* A tool for rapid application building |br| *(...or prototyping)*
+* Free Software (BSD)
 
 ----
 
 Just a simple API !
 ===================
 
-.. image:: showing-usage-of-daybed-in-one-picture
+----
+
+For any HTTP client!
+
+.. image:: media/daybed-archi.png
+
+----
+
+That you deploy once!
+
+.. image :: media/deploy-once.png
+
+----
+
+And use intuitively...
+
+.. image:: media/daybed-steps.png
 
 ----
 
@@ -72,8 +98,27 @@ Under the hood
 * **Pyramid**, a robust and powerful python Web framework
 * **Cornice**, a REST framework for Pyramid
 * **Colander** for the schema validation part
-* **Redis** as the default persistence backend *(or CouchDB)*
+* **Redis** as the default persistence backend |br| *(or CouchDB)*
 * **ElasticSearch** as indexing and faceted search engine *(pluggable)*
+
+----
+
+Key features
+============
+
+* Record validation *(from model schema)*
+* Authentication *(Hawk tokens)*
+* Permissions *(CRUD, by author etc.)*
+* Simple model relations
+
+----
+
+Spatial features
+================
+
+* Geometries field types |br| *(point, lines, polygons, geojson...)*
+* GeoJSON content type *(feature collection)*
+* Spatial indexing *(bounding box, distance, ...)*
 
 ----
 
@@ -84,25 +129,7 @@ Model definition
 * List of fields *(int, string, relations, ...)*
 * List of permissions
 
-→ REST endpoints ``/models/<id>/definition``, ``/models/<id>/records``
-
-----
-
-Key features
-============
-
-* Record validation *(from model schema)*
-* Authentication *(Hawk tokens)*
-* Permissions *(CRUD, by author etc.)*
-
-----
-
-Spatial features
-================
-
-* Geometries field types *(point, lines, polygons, geojson...)*
-* GeoJSON content type *(feature collection)*
-* Spatial indexing *(bounding box, distance, ...)*
+→ REST endpoints ``/models/<id>/definition`` |br| ``/models/<id>/records``
 
 ----
 
@@ -123,8 +150,13 @@ Daybed.js
 =========
 
 * Wrap HTTP requests
-* Uses promises *(with polyfill)*
+* Bring promises *(with polyfill)*
 * Authentication tokens *(Hawk signing)*
+* Helpers for sharing/syncing
+
+.. code-block :: html
+
+    <script src="//js.daybed.io/build/daybed.js"></script>
 
 ----
 
@@ -155,19 +187,15 @@ Getting started
 Getting started
 ===============
 
-.. code-block :: html
-
-    <script src="//js.daybed.io/build/daybed.js"></script>
-
-
 .. code-block :: javascript
 
-    var server = 'https://daybed.io';
-    var modelId = 'a-simple-location-model-with-label';
     var model = {
       definition: definition,
       permissions: permissions
     };
+
+    var server = 'https://daybed.io';
+    var modelId = 'a-simple-location-model-with-label';
 
     Daybed.startSession(server)
       .then(function (session) {
@@ -178,6 +206,9 @@ Getting started
 
 Load records
 ============
+
+* Default format is JSON
+* GeoJSON feature collection renderer |br| *(Accept header)*
 
 .. code-block :: javascript
 
@@ -195,18 +226,23 @@ Load records
 Create records
 ==============
 
+* POST data
+* Validated against model schema
+* Obtain record id
 .. code-block :: javascript
 
     map.on('dblclick', function(e) {
       // LatLng to [x, y]
       var point = [e.latlng.lng, e.latlng.lat];
+
       session.saveRecord(modelId, {
           label: 'Building',
           location: point
         })
         .then(function(record) {
-          var m = L.marker(e.latlng).addTo(map);
-          m._recordId = record.id;
+          var layer = L.marker(e.latlng).addTo(map);
+          // Keep record id
+          layer._recordId = record.id;
         });
     });
 
@@ -215,9 +251,12 @@ Create records
 Modify and delete
 =================
 
+* For example, delete on marker click:
+
 .. code-block :: javascript
 
     layer.on('click', function () {
+      // Using record id
       session.deleteRecord(model, layer._recordId)
         .then(function () {
           map.removeLayer(layer);
@@ -225,7 +264,18 @@ Modify and delete
     });
 
 * RESTful verbs *(PUT, PATCH, DELETE)*
-* ``session.deleteRecord(modelId, id)``, ``session.saveRecord(modelId, record)``
+* ``session.deleteRecord(modelId, id)`` |br| ``session.saveRecord(modelId, record)``
+
+----
+
+Demo
+====
+
+* http://js.daybed.io/examples/leaflet/
+
+.. raw:: html
+
+    <video src="media/collaborative-map.webm" autoplay loop>
 
 ----
 
@@ -234,7 +284,7 @@ Share authentication token
 
 * Shared token → collaborative app!
 
-For example, use token from URL hash or create a new one if missing:
+For example, via URL hash:
 
 .. code-block :: javascript
 
@@ -248,6 +298,8 @@ For example, use token from URL hash or create a new one if missing:
         console.error("Could not start session", e);
       });
 
+.. image :: media/location-token.png
+
 ----
 
 Lookup records
@@ -257,13 +309,12 @@ Lookup records
 * Records are indexed on creation
 * Every basic geometric types
 * Operators on BBox, distance
-* Geo point aggregates *(a.k.a. clustering, via `plugin <https://github.com/zenobase/geocluster-facet>`_)*
+* Geo point aggregates *(a.k.a. clustering)* via `plugin <https://github.com/zenobase/geocluster-facet>`_
 
 The best Web companion !
 
 * Sorts, paginates, aggregates, counts
-* Scales; Insanely fast
-* Ubiquitous
+* Scales — Insanely fast — Ubiquitous
 
 ----
 
@@ -294,35 +345,55 @@ Bounding box search
 
 ----
 
-Generic API means...
-====================
+Demo
+====
 
-* No effort on backend *(quick start)*
-* Logic-less API *(very basic rules)*
-* More work on the client *(computation, conflicts)*
-* Easier with schemaless database *(...or PostgreSQL json!)*
+* http://js.daybed.io/examples/search-extent/
 
-→ Daybed on server + `Turf.js <http://turfjs.org>`_ on client ?
+
+.. raw:: html
+
+    <video src="media/search-extent.webm" autoplay loop>
 
 ----
 
 Conclusion
 ==========
 
+----
+
+Generic API means...
+====================
+
+* No effort on backend *(quick start)*
+* Logic-less API *(very basic rules)*
+* More work on the client *(computation, conflicts)*
+* Easier with schemaless database |br| *(...or PostgreSQL json!)*
+
+→ Daybed on server + `Turf.js <http://turfjs.org>`_ on client ?
+
+----
+
+About your use-case ?
+=====================
+
 * Deploy one backend! Roll out many applications!
 
 → Think twice before implementing a custom backend!
 
-`Github <https://github.com/spiral-project>`_ — https://daybed.io/v1/
-
-See similar tools (`postgrest <https://github.com/begriffs/postgrest>`_, `Eve <http://python-eve.org>`_)
+http://daybed.rtfd.org — https://daybed.io/v1/
 
 ----
 
-Next steps
-==========
+Some ideas...
+=============
 
 * `Form builder <https://github.com/spiral-project/formbuilder>`_
-* A bit more HATEOAS
 * Websockets / SimplePush
 * Precondition headers
+* A bit more HATEOAS
+
+See also
+
+* `postgrest <https://github.com/begriffs/postgrest>`_ *(PostgreSQL as API, Haskell)*
+* `Eve <http://python-eve.org>`_ *(build generic APIs, Python)*
