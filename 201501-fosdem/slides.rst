@@ -371,8 +371,9 @@ Generic API means...
 
 * No effort on backend *(quick start)*
 * Logic-less API *(very basic rules)*
-* More work on the client *(computation, conflicts)*
 * Easier with schemaless database |br| *(...or PostgreSQL json!)*
+
+* More work on the client *(computation, conflicts)*
 
 → Daybed on server + `Turf.js <http://turfjs.org>`_ on client ?
 
