@@ -39,6 +39,18 @@ How would you build... ?
 
 ----
 
+Usually, you implement and deploy a backend...
+
+.. image :: media/no-dev-backend-1.png
+
+----
+
+With Daybed, you just plug your app !
+
+.. image :: media/no-dev-backend-2.png
+
+----
+
 Why Daybed ?
 ============
 
