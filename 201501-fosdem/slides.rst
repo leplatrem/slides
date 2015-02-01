@@ -74,21 +74,13 @@ Daybed is not...
 Daybed is...
 ============
 
-* A Web API *(REST, Create Read Update Delete)*
-* A “reusable” backend |br| *(1 instance → N different applications)*
-* A tool for rapid application building |br| *(...or prototyping)*
-* Free Software (BSD)
-
 ----
 
-Just a simple API !
-===================
-
-----
-
-For any HTTP client!
+A simple REST API... for any HTTP client!
 
 .. image:: media/daybed-archi.png
+
+* Open source *(BSD)*
 
 ----
 
